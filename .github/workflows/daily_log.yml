@@ -1,0 +1,35 @@
+name: Daily Logs Automation
+
+on:
+  schedule:
+    - cron: "0 16 * * *" # Trigger daily at 00:00 (GMT+8)
+
+defaults:
+  run:
+    shell: bash
+
+tasks:
+  generate-daily-log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate new log file
+        run: |
+          DATE=$(date +%F)
+          DIRECTORY="daily-notes"
+          TEMPLATE="templates/template.md"
+          OUTPUT_FILE="$DIRECTORY/$DATE.md"
+          if [[ ! -f "$OUTPUT_FILE" ]]; then
+            cp "$TEMPLATE" "$OUTPUT_FILE"
+            sed -i "s/\[Template\]/\[$DATE\]/g" "$OUTPUT_FILE"
+            git add "$OUTPUT_FILE"
+            git commit -m "Add daily log for $DATE"
+            git push
+          fi
