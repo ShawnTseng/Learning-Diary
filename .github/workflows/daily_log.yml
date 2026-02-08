@@ -8,7 +8,7 @@ defaults:
   run:
     shell: bash
 
-tasks:
+jobs:
   generate-daily-log:
     runs-on: ubuntu-latest
     steps:
